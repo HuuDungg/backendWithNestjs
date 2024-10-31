@@ -20,7 +20,7 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<CreateUserDto> {
-    createUserDto['password'] = this.getHashPassword(createUserDto['password'])
+    createUserDto.password = this.getHashPassword(createUserDto.password)
     await this.userModel.create(createUserDto);
     return (createUserDto);
   }

@@ -7,8 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import * as mongoosePaginate from 'mongoose-paginate-v2';
 import { softDeletePlugin } from 'soft-delete-plugin-mongoose';
 import { CompaniesModule } from './companies/companies.module';
 @Module({
@@ -20,6 +19,7 @@ import { CompaniesModule } from './companies/companies.module';
           uri: configService.get<string>('DATABASE'),
           connectionFactory: (connection) => {
             connection.plugin(softDeletePlugin);
+            connection.plugin(mongoosePaginate);
             return connection;
           }
 

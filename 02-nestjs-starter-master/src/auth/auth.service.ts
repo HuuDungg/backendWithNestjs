@@ -4,6 +4,7 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import ms from 'ms';
+import { IUser } from 'src/users/user.interface';
 @Injectable()
 export class AuthService {
     constructor(
@@ -13,18 +14,28 @@ export class AuthService {
     ) { }
 
     async validateUser(username: string, pass: string): Promise<any> {
+
         const user = await this.usersService.findByName(username) as User;
+
         if (this.usersService.isValidPassword(pass, user.password)) {
             return user;
         }
         return null;
     }
-    async login(user: { name: string, _id: string }) {
-        const payload = { username: user.name, sub: user._id, role: "HuuDung" };
+    async login(user: IUser) {
+        const payload = {
+            sub: "token login",
+            iss: "from server",
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+
+        };
         return {
             access_token: this.jwtService.sign(payload, {
-                secret: String(ms(this.config.get<string>('JWT_SECRET_KEY'))),
-                expiresIn: this.config.get<string | number>('JWT_EXPIRATION_TIME')
+                secret: this.config.get<string>('JWT_SECRET_KEY'),
+                expiresIn: ms(this.config.get<string>('JWT_EXPIRATION_TIME'))
             })
         };
     }

@@ -13,7 +13,6 @@ export class AppController {
   async login(@Request() req) {
     return this.authService.login(req.user);
   }
-  @Public()
   @Get('/profile')
   async profile(@Request() req) {
     return req.user;

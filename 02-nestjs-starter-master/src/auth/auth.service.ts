@@ -19,7 +19,7 @@ export class AuthService {
         return null;
     }
     async login(user: { name: string, _id: string }) {
-        const payload = { username: user.name, sub: user._id };
+        const payload = { username: user.name, sub: user._id, role: "HuuDung" };
         return {
             access_token: this.jwtService.sign(payload, {
                 secret: this.config.get<string>('JWT_SECRET_KEY'),

@@ -24,11 +24,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     handleRequest(err, user, info) {
         // You can throw an exception based on either "info" or "err" arguments
         if (err || !user) {
-            return {
-                code: 401,
-                message: "can not decode this jwt please, try again!",
-                WhoIsHuuDung: "best of fullstack develop"
-            }
+            throw err || new UnauthorizedException("cannot accept this token");
         }
         return user;
     }

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User, UserDocument } from './schemas/user.schema';
+import { User } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Error, Model } from 'mongoose';
-import { genSaltSync, hashSync } from 'bcryptjs';
+import { Model } from 'mongoose';
+import { genSaltSync, hashSync, compareSync } from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +19,10 @@ export class UsersService {
     return hash;
   }
 
+  isValidPassword = (password: string, hash: string): boolean => {
+    return compareSync(password, hash);
+  }
+
   async create(createUserDto: CreateUserDto): Promise<CreateUserDto> {
     createUserDto.password = this.getHashPassword(createUserDto.password)
     await this.userModel.create(createUserDto);
@@ -31,6 +35,11 @@ export class UsersService {
 
   async findOne(id: string): Promise<object> {
     const user = await this.userModel.findOne({ _id: id });
+    return user;
+  }
+
+  async findByName(userName: string): Promise<object> {
+    const user = await this.userModel.findOne({ name: userName });
     return user;
   }
 

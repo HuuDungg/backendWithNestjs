@@ -5,9 +5,21 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 require('dotenv').config()
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.useGlobalPipes(new ValidationPipe());
+
   const reflector = app.get(Reflector);
-  // app.useGlobalGuards(new JwtAuthGuard(reflector));
+  app.useGlobalGuards(new JwtAuthGuard(reflector));
+
+  //config cors
+  app.enableCors(
+    {
+      "origin": "*",
+      "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+      "preflightContinue": false,
+    }
+  );
+
   await app.listen(process.env.PORT);
 }
 bootstrap();

@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Public } from 'src/decorator/customize';
+import { Public, ResponseMessage } from 'src/decorator/customize';
 
 @Controller('users')
 export class UsersController {
@@ -14,6 +14,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
   @Get()
+  @ResponseMessage("Fetch List Company with paginate")
   findAll() {
     return this.usersService.findAll();
   }

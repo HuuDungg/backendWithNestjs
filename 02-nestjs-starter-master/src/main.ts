@@ -13,7 +13,9 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
   //config transform response by interceptor
-  app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalInterceptors(new TransformInterceptor(reflector));
+  //config global prefix
+  app.setGlobalPrefix('v1');
   //config cors
   app.enableCors(
     {

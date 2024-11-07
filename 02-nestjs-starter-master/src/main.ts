@@ -2,6 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { TransformInterceptor } from './core/transform.interceptor';
 require('dotenv').config()
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,7 +12,8 @@ async function bootstrap() {
   //setup global authentication
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
-
+  //config transform response by interceptor
+  app.useGlobalInterceptors(new TransformInterceptor());
   //config cors
   app.enableCors(
     {

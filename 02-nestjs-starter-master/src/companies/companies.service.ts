@@ -45,8 +45,6 @@ export class CompaniesService {
       },
       result //kết quả query
     }
-
-
   }
 
   findOne(id: string) {

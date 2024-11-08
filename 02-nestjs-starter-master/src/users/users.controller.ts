@@ -2,17 +2,23 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Public, ResponseMessage } from 'src/decorator/customize';
-
+import { IUser } from 'src/users/user.interface';
+import { User } from 'src/decorator/user.decorator';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
-  @Public()
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  create(@Body() createUserDto: CreateUserDto, @User() user: IUser) {
+    return this.usersService.create(createUserDto, user);
   }
+
+  @Post("/register")
+  @Public()
+  register(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.register(createUserDto);
+  }
+
   @Get()
   @ResponseMessage("Fetch List Company with paginate")
   findAll() {
@@ -30,12 +36,12 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @User() user: IUser) {
+    return this.usersService.update(id, updateUserDto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  remove(@Param('id') id: string, @User() user: IUser) {
+    return this.usersService.remove(id, user);
   }
 }

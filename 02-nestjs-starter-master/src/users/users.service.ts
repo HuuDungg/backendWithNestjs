@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { genSaltSync, hashSync, compareSync } from 'bcryptjs';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
+import { IUser } from './user.interface';
 
 @Injectable()
 export class UsersService {
@@ -24,10 +25,21 @@ export class UsersService {
     return compareSync(password, hash);
   }
 
-  async create(createUserDto: CreateUserDto): Promise<CreateUserDto> {
+  async create(createUserDto: CreateUserDto, user: IUser): Promise<CreateUserDto> {
     createUserDto.password = this.getHashPassword(createUserDto.password)
-    await this.userModel.create(createUserDto);
+    await this.userModel.create({
+      ...createUserDto, createdBy: {
+        _id: new mongoose.Types.ObjectId(user._id)!,
+        name: user.name
+      }
+    });
     return (createUserDto);
+  }
+
+  async register(registerUserDto: RegisterUserDto): Promise<RegisterUserDto> {
+    registerUserDto.password = this.getHashPassword(registerUserDto.password)
+    await this.userModel.create(registerUserDto);
+    return (registerUserDto);
   }
 
   findAll(): object {
@@ -44,13 +56,24 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.userModel.updateOne({ _id: id }, { ...updateUserDto });
-    return user;
+  async update(id: string, updateUserDto: UpdateUserDto, user: IUser) {
+    const newUser = await this.userModel.updateOne({ _id: id }, {
+      ...updateUserDto, updatedBy: {
+        _id: user._id,
+        name: user.name
+      }
+    });
+    return newUser;
   }
 
-  async remove(id: string) {
-    const user = await this.userModel.softDelete({ _id: id });
-    return user;
+  async remove(id: string, user: IUser) {
+    await this.userModel.updateOne({ _id: id }, {
+      deletedBy: {
+        _id: user._id,
+        name: user.name
+      }
+    });
+    const newUser = await this.userModel.softDelete({ _id: id });
+    return newUser;
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,8 +21,12 @@ export class UsersController {
 
   @Get()
   @ResponseMessage("Fetch List Company with paginate")
-  findAll() {
-    return this.usersService.findAll();
+  findAll(
+    @Query("page") currentPage: string,
+    @Query("limit") limit: string,
+    @Query() qs: string,
+  ) {
+    return this.usersService.findAll(+currentPage, +limit, qs);
   }
 
   @Get(':id')

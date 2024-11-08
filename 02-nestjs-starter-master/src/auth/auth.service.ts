@@ -30,13 +30,22 @@ export class AuthService {
             name: user.name,
             email: user.email,
             role: user.role
-
         };
+        const refresh = await this.refreshToken(payload)
         return {
             access_token: this.jwtService.sign(payload, {
                 secret: this.config.get<string>('JWT_SECRET_KEY'),
-                expiresIn: ms(this.config.get<string>('JWT_EXPIRATION_TIME'))
-            })
+                expiresIn: ms(this.config.get<string>('JWT_EXPIRATION_TIME')) / 1000
+            }),
+            refresh: refresh
         };
+    }
+
+    async refreshToken(payload: any) {
+        const refresh_token = await this.jwtService.sign(payload, {
+            secret: this.config.get<string>('REFRESH_JWT_SECRET_KEY'),
+            expiresIn: ms(this.config.get<string>('REFRESH_JWT_EXPIRATION_TIME')) / 1000
+        })
+        return refresh_token;
     }
 }

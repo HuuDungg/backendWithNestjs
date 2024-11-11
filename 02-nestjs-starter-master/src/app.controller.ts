@@ -18,11 +18,7 @@ export class AppController {
     @Req() req,
     @Res({ passthrough: true }) response: Response
   ) {
-    response.cookie('refresh_token', req.user.refreshToken, {
-      httpOnly: true,
-      maxAge: ms(this.config.get<string>('REFRESH_JWT_EXPIRATION_TIME'))
-    });
-    return this.authService.login(req.user);
+    return this.authService.login(req.user, response);
   }
   @Get('/profile')
   async profile(@User() user: IUser) {
@@ -32,6 +28,10 @@ export class AppController {
   @Public()
   @Get('/refresh')
   async refresh(@Req() request: Request) {
-    return request.cookies;
+    const refresh = request.cookies["refresh_token"]
+    const result = await this.authService.processNewToken(refresh);
+    return {
+      result
+    }
   }
 }

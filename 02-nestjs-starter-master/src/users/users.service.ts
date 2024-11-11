@@ -95,7 +95,12 @@ export class UsersService {
   }
 
   async updateRefreshtoken(_id: string, refreshToken: string) {
+    console.log("just save refresh: ", refreshToken);
     return await this.userModel.updateOne({ _id }, { refreshToken })
+  }
+
+  async findByRefresh(refreshToken: string) {
+    return await this.userModel.findOne({ refreshToken: refreshToken })
   }
 
   async remove(id: string, user: IUser) {

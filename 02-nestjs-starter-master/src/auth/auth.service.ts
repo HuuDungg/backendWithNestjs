@@ -31,8 +31,16 @@ export class AuthService {
             email: user.email,
             role: user.role
         };
-        const refresh = await this.refreshToken(payload)
+        //generate refresh token
+        const refresh = await this.refreshToken({ ...payload, sub: "refresh token" })
+
+        //update refresh token to database
+        this.usersService.updateRefreshtoken(user._id, refresh);
+
+        //set refresh token as the cookie
+
         return {
+            user: user,
             access_token: this.jwtService.sign(payload, {
                 secret: this.config.get<string>('JWT_SECRET_KEY'),
                 expiresIn: ms(this.config.get<string>('JWT_EXPIRATION_TIME')) / 1000

@@ -94,6 +94,10 @@ export class UsersService {
     return newUser;
   }
 
+  async updateRefreshtoken(_id: string, refreshToken: string) {
+    return await this.userModel.updateOne({ _id }, { refreshToken })
+  }
+
   async remove(id: string, user: IUser) {
     await this.userModel.updateOne({ _id: id }, {
       deletedBy: {

@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
+import cookieParser from 'cookie-parser';
+
 require('dotenv').config()
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,7 +21,6 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: ['1', '2'] //v1, v2
   });
-
   //config cors
   app.enableCors(
     {
@@ -28,6 +29,8 @@ async function bootstrap() {
       "preflightContinue": false,
     }
   );
+  //config to use cookie parser
+  app.use(cookieParser());
 
   await app.listen(process.env.PORT);
 }

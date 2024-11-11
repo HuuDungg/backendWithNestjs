@@ -71,10 +71,31 @@ export class AuthService {
                 secret: this.config.get<string>('REFRESH_JWT_SECRET_KEY'),
             })
             const result = await this.usersService.findByRefresh(refresh_token) as any
-            console.log("check result: ", result.refreshToken);
-
+            const payload = {
+                sub: "token login",
+                iss: "from server",
+                _id: result._id,
+                name: result.name,
+                email: result.email,
+                role: result.role
+            };
             if (result.refreshToken === refresh_token) {
-                return result;
+
+                return {
+                    user: {
+                        _id: result._id,
+                        email: result.email,
+                        name: result.name,
+                        role: result.role,
+                    },
+                    access_token: this.jwtService.sign(payload, {
+                        secret: this.config.get<string>('JWT_SECRET_KEY'),
+                        expiresIn: ms(this.config.get<string>('JWT_EXPIRATION_TIME')) / 1000
+                    }),
+                    refresh: refresh_token
+                };
+            } else {
+                throw new BadRequestException("Refresh token is not the last version")
             }
         } catch (error) {
             throw new BadRequestException("Refresh token is invalid")

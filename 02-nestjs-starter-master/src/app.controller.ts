@@ -6,6 +6,8 @@ import { Public } from './decorator/customize';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import ms from 'ms';
+import { IUser } from './users/user.interface';
+import { User } from './decorator/user.decorator';
 @Controller()
 export class AppController {
   constructor(private authService: AuthService, private config: ConfigService) { }
@@ -23,7 +25,13 @@ export class AppController {
     return this.authService.login(req.user);
   }
   @Get('/profile')
-  async profile(@Req() req) {
-    return req.user;
+  async profile(@User() user: IUser) {
+    return user;
+  }
+
+  @Public()
+  @Get('/refresh')
+  async refresh(@Req() request: Request) {
+    return request.cookies;
   }
 }
